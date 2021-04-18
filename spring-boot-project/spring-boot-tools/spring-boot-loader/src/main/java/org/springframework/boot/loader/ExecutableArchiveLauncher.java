@@ -45,6 +45,7 @@ public abstract class ExecutableArchiveLauncher extends Launcher {
 
 	public ExecutableArchiveLauncher() {
 		try {
+			// 初始化archive文件
 			this.archive = createArchive();
 			this.classPathIndex = getClassPathIndex(this.archive);
 		}
@@ -69,9 +70,11 @@ public abstract class ExecutableArchiveLauncher extends Launcher {
 
 	@Override
 	protected String getMainClass() throws Exception {
+		// 获取MANIFEST.MF文件
 		Manifest manifest = this.archive.getManifest();
 		String mainClass = null;
 		if (manifest != null) {
+			// 获取Start-Class配置值
 			mainClass = manifest.getMainAttributes().getValue(START_CLASS_ATTRIBUTE);
 		}
 		if (mainClass == null) {
@@ -89,6 +92,7 @@ public abstract class ExecutableArchiveLauncher extends Launcher {
 		if (this.classPathIndex != null) {
 			urls.addAll(this.classPathIndex.getUrls());
 		}
+		// \BOOT-INF\lib中的所有jar文件路径URL和一个\BOOT-INF\classes
 		return createClassLoader(urls.toArray(new URL[0]));
 	}
 
@@ -102,6 +106,7 @@ public abstract class ExecutableArchiveLauncher extends Launcher {
 	@Override
 	protected Iterator<Archive> getClassPathArchivesIterator() throws Exception {
 		Archive.EntryFilter searchFilter = this::isSearchCandidate;
+		// 获取\BOOT-INF\下classes目录和lib目录下的jar文件
 		Iterator<Archive> archives = this.archive.getNestedArchives(searchFilter,
 				(entry) -> isNestedArchive(entry) && !isEntryIndexed(entry));
 		if (isPostProcessingClassPathArchives()) {

@@ -43,6 +43,7 @@ public abstract class Launcher {
 	private static final String JAR_MODE_LAUNCHER = "org.springframework.boot.loader.jarmode.JarModeLauncher";
 
 	/**
+	 * <p>启动应用程序。这个方法是初始入口点，应该由子类public static void main(String[] args)方法调用。</p>
 	 * Launch the application. This method is the initial entry point that should be
 	 * called by a subclass {@code public static void main(String[] args)} method.
 	 * @param args the incoming arguments
@@ -52,9 +53,12 @@ public abstract class Launcher {
 		if (!isExploded()) {
 			JarFile.registerUrlProtocolHandler();
 		}
+		// 创建一个自定义ClassLoader(LaunchedURLClassLoader);
 		ClassLoader classLoader = createClassLoader(getClassPathArchivesIterator());
 		String jarMode = System.getProperty("jarmode");
+		// 获取启动类（一般为被@SpringBootApplication标记的main方法类）；
 		String launchClass = (jarMode != null && !jarMode.isEmpty()) ? JAR_MODE_LAUNCHER : getMainClass();
+		// 启动
 		launch(args, launchClass, classLoader);
 	}
 
@@ -83,10 +87,12 @@ public abstract class Launcher {
 		while (archives.hasNext()) {
 			urls.add(archives.next().getUrl());
 		}
+		// 使用符合条件的文件的url创建类加载器
 		return createClassLoader(urls.toArray(new URL[0]));
 	}
 
 	/**
+	 * <p>为指定的url创建一个类加载器。</p>
 	 * Create a classloader for the specified URLs.
 	 * @param urls the URLs
 	 * @return the classloader
@@ -97,6 +103,7 @@ public abstract class Launcher {
 	}
 
 	/**
+	 * <p>在给定存档文件和完全配置的类加载器的情况下启动应用程序。</p>
 	 * Launch the application given the archive file and a fully configured classloader.
 	 * @param args the incoming arguments
 	 * @param launchClass the launch class to run
@@ -104,7 +111,9 @@ public abstract class Launcher {
 	 * @throws Exception if the launch fails
 	 */
 	protected void launch(String[] args, String launchClass, ClassLoader classLoader) throws Exception {
+		// 将自定义的类加载器设置到当前线程
 		Thread.currentThread().setContextClassLoader(classLoader);
+		// 创建MainMethodRunner，并运行run方法
 		createMainMethodRunner(launchClass, args, classLoader).run();
 	}
 
@@ -127,6 +136,7 @@ public abstract class Launcher {
 	protected abstract String getMainClass() throws Exception;
 
 	/**
+	 * <p>返回将用于构造类路径的存档。</p>
 	 * Returns the archives that will be used to construct the class path.
 	 * @return the class path archives
 	 * @throws Exception if the class path archives cannot be obtained
@@ -152,6 +162,7 @@ public abstract class Launcher {
 		ProtectionDomain protectionDomain = getClass().getProtectionDomain();
 		CodeSource codeSource = protectionDomain.getCodeSource();
 		URI location = (codeSource != null) ? codeSource.getLocation().toURI() : null;
+		// jar文件的绝对路径
 		String path = (location != null) ? location.getSchemeSpecificPart() : null;
 		if (path == null) {
 			throw new IllegalStateException("Unable to determine code source archive");
@@ -160,6 +171,7 @@ public abstract class Launcher {
 		if (!root.exists()) {
 			throw new IllegalStateException("Unable to determine code source archive from " + root);
 		}
+		// 创建Archive实例
 		return (root.isDirectory() ? new ExplodedArchive(root) : new JarFileArchive(root));
 	}
 

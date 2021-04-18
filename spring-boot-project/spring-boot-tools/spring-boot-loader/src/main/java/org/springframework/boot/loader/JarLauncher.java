@@ -76,6 +76,7 @@ public class JarLauncher extends ExecutableArchiveLauncher {
 
 	@Override
 	protected boolean isSearchCandidate(Archive.Entry entry) {
+		// 判断名称是否以BOOT-INF/开头
 		return entry.getName().startsWith("BOOT-INF/");
 	}
 
@@ -84,7 +85,15 @@ public class JarLauncher extends ExecutableArchiveLauncher {
 		return NESTED_ARCHIVE_ENTRY_FILTER.matches(entry);
 	}
 
+
+	/*
+	 * 使用springboot打包的jar文件，java -jar程序执行入口
+	 */
 	public static void main(String[] args) throws Exception {
+		/*
+		 * 创建一个JarLauncher对象，父类ExecutableArchiveLauncher的无参构造方法中会
+		 * 实例化archive实例（jar文件）
+		 */
 		new JarLauncher().launch(args);
 	}
 

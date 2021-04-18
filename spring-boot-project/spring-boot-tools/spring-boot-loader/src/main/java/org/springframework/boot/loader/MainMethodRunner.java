@@ -19,6 +19,7 @@ package org.springframework.boot.loader;
 import java.lang.reflect.Method;
 
 /**
+ * <p>Launcher用来调用main方法的实用程序类。使用线程上下文类装入器装入包含main方法的类。</p>
  * Utility class that is used by {@link Launcher}s to call a main method. The class
  * containing the main method is loaded using the thread context class loader.
  *
@@ -43,7 +44,9 @@ public class MainMethodRunner {
 	}
 
 	public void run() throws Exception {
+		// 加载mainClass对象
 		Class<?> mainClass = Class.forName(this.mainClassName, false, Thread.currentThread().getContextClassLoader());
+		// 获取main方法，并调用
 		Method mainMethod = mainClass.getDeclaredMethod("main", String[].class);
 		mainMethod.setAccessible(true);
 		mainMethod.invoke(null, new Object[] { this.args });

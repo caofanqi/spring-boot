@@ -30,6 +30,7 @@ import java.util.jar.Manifest;
 import org.springframework.boot.loader.Launcher;
 
 /**
+ * <p>可以由启动程序启动的存档。</p>
  * An archive that can be launched by the {@link Launcher}.
  *
  * @author Phillip Webb
