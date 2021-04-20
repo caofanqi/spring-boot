@@ -20,6 +20,7 @@ import org.springframework.boot.web.server.WebServer;
 import org.springframework.context.SmartLifecycle;
 
 /**
+ * <p>SmartLifecycle在ServletWebServerApplicationContext中启动和停止WebServer。</p>
  * {@link SmartLifecycle} to start and stop the {@link WebServer} in a
  * {@link ServletWebServerApplicationContext}.
  *
@@ -42,6 +43,7 @@ class WebServerStartStopLifecycle implements SmartLifecycle {
 	public void start() {
 		this.webServer.start();
 		this.running = true;
+		// 发布ServletWebServerInitializedEvent事件
 		this.applicationContext
 				.publishEvent(new ServletWebServerInitializedEvent(this.webServer, this.applicationContext));
 	}

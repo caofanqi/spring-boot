@@ -25,6 +25,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
+ * <p>用于创建SpringApplication使用的ConfigurableApplicationContext的策略接口。
+ * 创建的上下文应该以默认形式返回，SpringApplication负责配置和刷新上下文。</p>
+ *
  * Strategy interface for creating the {@link ConfigurableApplicationContext} used by a
  * {@link SpringApplication}. Created contexts should be returned in their default form,
  * with the {@code SpringApplication} responsible for configuring and refreshing the

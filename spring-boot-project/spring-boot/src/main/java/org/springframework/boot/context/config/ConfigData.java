@@ -29,6 +29,7 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.util.Assert;
 
 /**
+ * <p>从ConfigDataResource加载的配置数据，并可能最终为Spring的环境提供属性源。</p>
  * Configuration data that has been loaded from a {@link ConfigDataResource} and may
  * ultimately contribute {@link PropertySource property sources} to Spring's
  * {@link Environment}.

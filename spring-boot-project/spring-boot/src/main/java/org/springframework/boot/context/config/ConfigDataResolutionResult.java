@@ -17,6 +17,7 @@
 package org.springframework.boot.context.config;
 
 /**
+ * <p>从ConfigDataLocationResolvers返回的结果，包含ConfigDataResource和原始ConfigDataLocation。</p>
  * Result returned from {@link ConfigDataLocationResolvers} containing both the
  * {@link ConfigDataResource} and the original {@link ConfigDataLocation}.
  *

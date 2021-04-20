@@ -31,6 +31,7 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.util.Assert;
 
 /**
+ * <p>BeanPostProcessor，它将bean工厂中的所有WebServerFactoryCustomizer bean应用到WebServerFactory bean。</p>
  * {@link BeanPostProcessor} that applies all {@link WebServerFactoryCustomizer} beans
  * from the bean factory to {@link WebServerFactory} beans.
  *
@@ -67,6 +68,7 @@ public class WebServerFactoryCustomizerBeanPostProcessor implements BeanPostProc
 
 	@SuppressWarnings("unchecked")
 	private void postProcessBeforeInitialization(WebServerFactory webServerFactory) {
+		// 通过WebServerFactoryCustomizer自定义WebServerFactory
 		LambdaSafe.callbacks(WebServerFactoryCustomizer.class, getCustomizers(), webServerFactory)
 				.withLogger(WebServerFactoryCustomizerBeanPostProcessor.class)
 				.invoke((customizer) -> customizer.customize(webServerFactory));

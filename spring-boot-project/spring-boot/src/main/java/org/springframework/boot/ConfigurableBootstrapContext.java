@@ -17,6 +17,7 @@
 package org.springframework.boot;
 
 /**
+ * <p>一个BootstrapContext，它还通过BootstrapRegistry接口提供配置方法。</p>
  * A {@link BootstrapContext} that also provides configuration methods via the
  * {@link BootstrapRegistry} interface.
  *

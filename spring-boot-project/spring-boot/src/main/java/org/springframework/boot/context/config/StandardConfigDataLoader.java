@@ -45,7 +45,9 @@ public class StandardConfigDataLoader implements ConfigDataLoader<StandardConfig
 				Origin.from(reference.getConfigDataLocation()));
 		String name = String.format("Config resource '%s' via location '%s'", resource,
 				reference.getConfigDataLocation());
+		// 获取PropertySourceLoader加载资源
 		List<PropertySource<?>> propertySources = reference.getPropertySourceLoader().load(name, originTrackedResource);
+		// 封装成ConfigData返回
 		return new ConfigData(propertySources);
 	}
 

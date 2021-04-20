@@ -26,6 +26,7 @@ import org.springframework.core.env.SimpleCommandLinePropertySource;
 import org.springframework.util.Assert;
 
 /**
+ * <p>ApplicationArguments的默认实现。</p>
  * Default implementation of {@link ApplicationArguments}.
  *
  * @author Phillip Webb
@@ -70,6 +71,7 @@ public class DefaultApplicationArguments implements ApplicationArguments {
 		return this.source.getNonOptionArgs();
 	}
 
+	// 使用SimpleCommandLinePropertySource来提供对选项和非选项的访问
 	private static class Source extends SimpleCommandLinePropertySource {
 
 		Source(String[] args) {

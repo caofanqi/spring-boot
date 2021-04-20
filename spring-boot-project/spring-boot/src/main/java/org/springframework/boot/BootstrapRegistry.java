@@ -24,14 +24,20 @@ import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 
 /**
+ * <p>一个简单的对象注册表，在启动和环境后处理期间可用，直到ApplicationContext准备好为止。</p>
  * A simple object registry that is available during startup and {@link Environment}
  * post-processing up to the point that the {@link ApplicationContext} is prepared.
+ * <p>可以用于注册实例，这些实例的创建成本可能很高，或者需要在ApplicationContext可用之前共享。</p>
  * <p>
  * Can be used to register instances that may be expensive to create, or need to be shared
  * before the {@link ApplicationContext} is available.
+ * <p>注册表使用Class作为键，这意味着只能存储给定类型的单个实例。</p>
  * <p>
  * The registry uses {@link Class} as a key, meaning that only a single instance of a
  * given type can be stored.
+ * <p>addCloseListener(ApplicationListener)方法可以用于添加一个监听器，
+ * 当BootstrapContext关闭并且ApplicationContext完全准备好时，该监听器可以执行操作。
+ * 例如，一个实例可以选择将自己注册为一个常规的Spring bean，以便应用程序可以使用它。</p>
  * <p>
  * The {@link #addCloseListener(ApplicationListener)} method can be used to add a listener
  * that can perform actions when {@link BootstrapContext} has been closed and the

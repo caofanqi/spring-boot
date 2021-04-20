@@ -47,6 +47,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * <p>servlet web服务器的配置类</p>
+ * <p>它们应该在常规的自动配置类中使用@Import来保证它们的执行顺序。</p>
  * Configuration classes for servlet web servers
  * <p>
  * Those should be {@code @Import} in a regular auto-configuration class to guarantee
@@ -68,6 +70,7 @@ class ServletWebServerFactoryConfiguration {
 	@ConditionalOnMissingBean(value = ServletWebServerFactory.class, search = SearchStrategy.CURRENT)
 	static class EmbeddedTomcat {
 
+		// 定义一个TomcatServletWebServerFactory bean
 		@Bean
 		TomcatServletWebServerFactory tomcatServletWebServerFactory(
 				ObjectProvider<TomcatConnectorCustomizer> connectorCustomizers,

@@ -17,6 +17,7 @@
 package org.springframework.boot.context.config;
 
 /**
+ * <p>可以从中加载ConfigData的单个资源。实现必须实现一个有效的equals、hashCode和toString方法。</p>
  * A single resource from which {@link ConfigData} can be loaded. Implementations must
  * implement a valid {@link #equals(Object) equals}, {@link #hashCode() hashCode} and
  * {@link #toString() toString} methods.

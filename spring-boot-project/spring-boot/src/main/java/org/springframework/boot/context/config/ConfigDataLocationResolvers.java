@@ -34,6 +34,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.SpringFactoriesLoader;
 
 /**
+ * <p>通过spring.factories加载的ConfigDataLocationResolver实例集合。</p>
  * A collection of {@link ConfigDataLocationResolver} instances loaded via
  * {@code spring.factories}.
  *

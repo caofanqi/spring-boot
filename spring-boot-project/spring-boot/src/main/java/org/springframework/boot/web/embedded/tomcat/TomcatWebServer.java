@@ -46,6 +46,8 @@ import org.springframework.boot.web.server.WebServerException;
 import org.springframework.util.Assert;
 
 /**
+ * <p>可以用来控制Tomcat web服务器的web服务器。
+ * 通常，这个类应该使用TomcatReactiveWebServerFactory或TomcatServletWebServerFactory创建，但不能直接创建。</p>
  * {@link WebServer} that can be used to control a Tomcat web server. Usually this class
  * should be created using the {@link TomcatReactiveWebServerFactory} or
  * {@link TomcatServletWebServerFactory}, but not directly.
@@ -120,6 +122,7 @@ public class TomcatWebServer implements WebServer {
 				});
 
 				// Start the server to trigger initialization listeners
+				// 启动服务器以触发初始化侦听器
 				this.tomcat.start();
 
 				// We can re-throw failure exception directly in the main thread
@@ -134,6 +137,7 @@ public class TomcatWebServer implements WebServer {
 
 				// Unlike Jetty, all Tomcat threads are daemon threads. We create a
 				// blocking non-daemon to stop immediate shutdown
+				// 与Jetty不同，所有Tomcat线程都是守护线程。我们创建一个阻塞非守护进程停止立即关闭
 				startDaemonAwaitThread();
 			}
 			catch (Exception ex) {

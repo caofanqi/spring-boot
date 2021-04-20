@@ -43,6 +43,7 @@ import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.util.Assert;
 
 /**
+ * <p>一个容器对象，它从一个或多个ConfigurationPropertySource绑定对象。</p>
  * A container object which Binds objects from one or more
  * {@link ConfigurationPropertySource ConfigurationPropertySources}.
  *

@@ -92,6 +92,10 @@ public class SpringApplicationJsonEnvironmentPostProcessor implements Environmen
 
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+		/*
+		 * 获取propertySources中的spring.application.json和SPRING_APPLICATION_JSON的json字符串
+		 * 构建成JsonPropertySource,添加到environment中。
+		 */
 		MutablePropertySources propertySources = environment.getPropertySources();
 		propertySources.stream().map(JsonPropertyValue::get).filter(Objects::nonNull).findFirst()
 				.ifPresent((v) -> processJson(environment, v));

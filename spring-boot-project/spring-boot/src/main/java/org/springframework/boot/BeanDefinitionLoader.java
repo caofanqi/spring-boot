@@ -76,6 +76,7 @@ class BeanDefinitionLoader {
 	private ResourceLoader resourceLoader;
 
 	/**
+	 * <p>创建一个新的BeanDefinitionLoader，它将把bean加载到指定的BeanDefinitionRegistry中。</p>
 	 * Create a new {@link BeanDefinitionLoader} that will load beans into the specified
 	 * {@link BeanDefinitionRegistry}.
 	 * @param registry the bean definition registry that will contain the loaded beans

@@ -60,6 +60,7 @@ class ReflectionEnvironmentPostProcessorsFactory implements EnvironmentPostProce
 					parameters.add(BootstrapContext.class, bootstrapContext);
 					parameters.add(BootstrapRegistry.class, bootstrapContext);
 				});
+		// 实例化所有的EnvironmentPostProcessor
 		return instantiator.instantiate(this.classNames);
 	}
 

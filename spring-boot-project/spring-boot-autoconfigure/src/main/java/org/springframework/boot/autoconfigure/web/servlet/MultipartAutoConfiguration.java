@@ -35,6 +35,9 @@ import org.springframework.web.multipart.support.StandardServletMultipartResolve
 import org.springframework.web.servlet.DispatcherServlet;
 
 /**
+ * <p>自动配置多部分上传。如果没有，则添加StandardServletMultipartResolver，如果没有其他定义，则添加multipartConfigElement。
+ * ServletWebServerApplicationContext将把MultipartConfigElement bean关联到任何Servlet bean。</p>
+ * <p>ultipartConfigElement是一个Servlet API，用于配置服务器如何处理文件上传。</p>
  * {@link EnableAutoConfiguration Auto-configuration} for multi-part uploads. Adds a
  * {@link StandardServletMultipartResolver} if none is present, and adds a
  * {@link javax.servlet.MultipartConfigElement multipartConfigElement} if none is

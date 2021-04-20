@@ -26,6 +26,9 @@ import java.lang.annotation.Target;
 import org.springframework.context.annotation.Import;
 
 /**
+ * <p>使用AutoConfigurationPackages注册包，如果指定basePackages或basePackageClasses，
+ * 注册带注释类的包。
+ * </p>
  * Registers packages with {@link AutoConfigurationPackages}. When no {@link #basePackages
  * base packages} or {@link #basePackageClasses base package classes} are specified, the
  * package of the annotated class is registered.
@@ -42,6 +45,8 @@ import org.springframework.context.annotation.Import;
 public @interface AutoConfigurationPackage {
 
 	/**
+	 * <p>应该在AutoConfigurationPackages中注册的基本包。</p>
+	 * <p>使用basePackageClasses作为基于字符串的包名的类型安全替代。</p>
 	 * Base packages that should be registered with {@link AutoConfigurationPackages}.
 	 * <p>
 	 * Use {@link #basePackageClasses} for a type-safe alternative to String-based package
@@ -52,6 +57,8 @@ public @interface AutoConfigurationPackage {
 	String[] basePackages() default {};
 
 	/**
+	 * <p>类型安全的basePackages替代方案，用于指定要在AutoConfigurationPackages中注册的包。</p>
+	 * <p>考虑在每个包中创建一个特殊的无操作标记类或接口，它除了被这个属性引用之外没有其他用途。</p>
 	 * Type-safe alternative to {@link #basePackages} for specifying the packages to be
 	 * registered with {@link AutoConfigurationPackages}.
 	 * <p>

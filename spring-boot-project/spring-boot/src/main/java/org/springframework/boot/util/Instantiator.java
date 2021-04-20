@@ -34,6 +34,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
 /**
+ * <p>通过注入可用的参数来实例化对象的简单工厂。</p>
  * Simple factory used to instantiate objects by injecting available parameters.
  *
  * @param <T> the type to instantiate

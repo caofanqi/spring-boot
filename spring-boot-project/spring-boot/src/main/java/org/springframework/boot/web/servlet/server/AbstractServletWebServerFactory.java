@@ -241,6 +241,7 @@ public abstract class AbstractServletWebServerFactory extends AbstractConfigurab
 	}
 
 	/**
+	 * <p>实用工具方法，子类可以使用它来组合指定的ServletContextInitializer参数和在这个实例中定义的参数。</p>
 	 * Utility method that can be used by subclasses wishing to combine the specified
 	 * {@link ServletContextInitializer} parameters with those defined in this instance.
 	 * @param initializers the initializers to merge

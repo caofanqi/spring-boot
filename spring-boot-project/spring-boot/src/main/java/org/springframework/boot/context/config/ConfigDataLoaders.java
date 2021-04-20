@@ -34,6 +34,7 @@ import org.springframework.core.log.LogMessage;
 import org.springframework.util.Assert;
 
 /**
+ * <p>通过spring.factories加载的ConfigDataLoader实例的集合。</p>
  * A collection of {@link ConfigDataLoader} instances loaded via {@code spring.factories}.
  *
  * @author Phillip Webb
@@ -90,6 +91,7 @@ class ConfigDataLoaders {
 	}
 
 	/**
+	 * <p>使用第一个适当的ConfigDataLoader加载ConfigData。</p>
 	 * Load {@link ConfigData} using the first appropriate {@link ConfigDataLoader}.
 	 * @param <R> the resource type
 	 * @param context the loader context
@@ -98,8 +100,10 @@ class ConfigDataLoaders {
 	 * @throws IOException on IO error
 	 */
 	<R extends ConfigDataResource> ConfigData load(ConfigDataLoaderContext context, R resource) throws IOException {
+		// 获取适当的ConfigDataLoader
 		ConfigDataLoader<R> loader = getLoader(context, resource);
 		this.logger.trace(LogMessage.of(() -> "Loading " + resource + " using loader " + loader.getClass().getName()));
+		// 使用ConfigDataLoader加载ConfigData
 		return loader.load(context, resource);
 	}
 

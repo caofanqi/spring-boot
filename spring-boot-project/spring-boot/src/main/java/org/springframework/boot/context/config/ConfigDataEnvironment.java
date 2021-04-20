@@ -45,10 +45,15 @@ import org.springframework.core.log.LogMessage;
 import org.springframework.util.StringUtils;
 
 /**
+ * <p>围绕ConfigurableEnvironment的包装器，可用于导入和应用ConfigData。
+ * 通过包装来自Spring Environment的property source并添加初始locations，
+ * 配置ConfigDataEnvironmentContributors的初始集。</p>
  * Wrapper around a {@link ConfigurableEnvironment} that can be used to import and apply
  * {@link ConfigData}. Configures the initial set of
  * {@link ConfigDataEnvironmentContributors} by wrapping property sources from the Spring
  * {@link Environment} and adding the initial set of locations.
+ * <p>初始locations可以通过LOCATION_PROPERTY、ADDITIONAL_LOCATION_PROPERTY和IMPORT_PROPERTY属性影响。
+ * 如果没有设置显式属性，则将使用DEFAULT_SEARCH_LOCATIONS。</p>
  * <p>
  * The initial locations can be influenced via the {@link #LOCATION_PROPERTY},
  * {@value #ADDITIONAL_LOCATION_PROPERTY} and {@value #IMPORT_PROPERTY} properties. If no
@@ -140,6 +145,7 @@ class ConfigDataEnvironment {
 	ConfigDataEnvironment(DeferredLogFactory logFactory, ConfigurableBootstrapContext bootstrapContext,
 			ConfigurableEnvironment environment, ResourceLoader resourceLoader, Collection<String> additionalProfiles,
 			ConfigDataEnvironmentUpdateListener environmentUpdateListener) {
+		// 从指定的环境创建一个新的绑定实例。
 		Binder binder = Binder.get(environment);
 		UseLegacyConfigProcessingException.throwIfRequested(binder);
 		this.logFactory = logFactory;
@@ -148,10 +154,14 @@ class ConfigDataEnvironment {
 				.orElse(ConfigDataNotFoundAction.FAIL);
 		this.bootstrapContext = bootstrapContext;
 		this.environment = environment;
+		// 从META-INF/spring.factories中初始化ConfigDataLocationResolver实例
 		this.resolvers = createConfigDataLocationResolvers(logFactory, bootstrapContext, binder, resourceLoader);
+		// 编程方式通过main方法附加Profiles
 		this.additionalProfiles = additionalProfiles;
+		// 环境修改监听器
 		this.environmentUpdateListener = (environmentUpdateListener != null) ? environmentUpdateListener
 				: ConfigDataEnvironmentUpdateListener.NONE;
+		// 从META-INF/spring.factories中初始化ConfigDataLoader集合
 		this.loaders = new ConfigDataLoaders(logFactory, bootstrapContext);
 		this.contributors = createContributors(binder);
 	}
@@ -220,6 +230,7 @@ class ConfigDataEnvironment {
 	}
 
 	/**
+	 * <p>处理所有contributions，并将任何新导入的属性源应用到Environment</p>
 	 * Process all contributions and apply any newly imported property sources to the
 	 * {@link Environment}.
 	 */
@@ -227,18 +238,21 @@ class ConfigDataEnvironment {
 		ConfigDataImporter importer = new ConfigDataImporter(this.logFactory, this.notFoundAction, this.resolvers,
 				this.loaders);
 		registerBootstrapBinder(this.contributors, null, DENY_INACTIVE_BINDING);
+		// 处理解析contributors
 		ConfigDataEnvironmentContributors contributors = processInitial(this.contributors, importer);
 		ConfigDataActivationContext activationContext = createActivationContext(
 				contributors.getBinder(null, BinderOption.FAIL_ON_BIND_TO_INACTIVE_SOURCE));
 		contributors = processWithoutProfiles(contributors, importer, activationContext);
 		activationContext = withProfiles(contributors, activationContext);
 		contributors = processWithProfiles(contributors, importer, activationContext);
+		// 应用到Environment
 		applyToEnvironment(contributors, activationContext);
 	}
 
 	private ConfigDataEnvironmentContributors processInitial(ConfigDataEnvironmentContributors contributors,
 			ConfigDataImporter importer) {
 		this.logger.trace("Processing initial config data environment contributors without activation context");
+		// 处理导入
 		contributors = contributors.withProcessedImports(importer, null);
 		registerBootstrapBinder(contributors, null, DENY_INACTIVE_BINDING);
 		return contributors;
@@ -335,6 +349,7 @@ class ConfigDataEnvironment {
 				else {
 					this.logger
 							.trace(LogMessage.format("Adding imported property source '%s'", propertySource.getName()));
+					// 添加到propertySources末尾
 					propertySources.addLast(propertySource);
 					this.environmentUpdateListener.onPropertySourceAdded(propertySource, contributor.getLocation(),
 							contributor.getResource());

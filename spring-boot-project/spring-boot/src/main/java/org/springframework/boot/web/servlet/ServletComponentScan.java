@@ -30,6 +30,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
 
 /**
+ * <p>支持扫描Servlet组件(过滤器、Servlet和侦听器)。扫描仅在使用嵌入式web服务器时执行。</p>
+ * <p>通常，应该指定value、basePackages或basePackageClasses中的一个，以控制要扫描组件的包。在没有注释的情况下，将从带有注释的类的包中执行扫描。</p>
  * Enables scanning for Servlet components ({@link WebFilter filters}, {@link WebServlet
  * servlets}, and {@link WebListener listeners}). Scanning is only performed when using an
  * embedded web server.

@@ -51,6 +51,8 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.DispatcherServlet;
 
 /**
+ * <p>pring DispatcherServlet的自动配置。
+ * 应该适用于已经存在嵌入式web服务器的独立应用程序，也适用于使用SpringBootServletInitializer的可部署应用程序。</p>
  * {@link EnableAutoConfiguration Auto-configuration} for the Spring
  * {@link DispatcherServlet}. Should work for a standalone application where an embedded
  * web server is already present and also for a deployable application using
@@ -79,12 +81,14 @@ public class DispatcherServletAutoConfiguration {
 	 */
 	public static final String DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME = "dispatcherServletRegistration";
 
+	// 配置DispatcherServlet
 	@Configuration(proxyBeanMethods = false)
 	@Conditional(DefaultDispatcherServletCondition.class)
 	@ConditionalOnClass(ServletRegistration.class)
 	@EnableConfigurationProperties(WebMvcProperties.class)
 	protected static class DispatcherServletConfiguration {
 
+		// 定义一个beanName为dispatcherServlet的DispatcherServlet bean
 		@Bean(name = DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
 		public DispatcherServlet dispatcherServlet(WebMvcProperties webMvcProperties) {
 			DispatcherServlet dispatcherServlet = new DispatcherServlet();
@@ -101,6 +105,7 @@ public class DispatcherServletAutoConfiguration {
 		@ConditionalOnMissingBean(name = DispatcherServlet.MULTIPART_RESOLVER_BEAN_NAME)
 		public MultipartResolver multipartResolver(MultipartResolver resolver) {
 			// Detect if the user has created a MultipartResolver but named it incorrectly
+			// 检测用户是否创建了MultipartResolver但命名不正确
 			return resolver;
 		}
 
@@ -113,6 +118,7 @@ public class DispatcherServletAutoConfiguration {
 	@Import(DispatcherServletConfiguration.class)
 	protected static class DispatcherServletRegistrationConfiguration {
 
+		// 将DispatcherServlet使用DispatcherServletRegistrationBean进行包装
 		@Bean(name = DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME)
 		@ConditionalOnBean(value = DispatcherServlet.class, name = DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
 		public DispatcherServletRegistrationBean dispatcherServletRegistration(DispatcherServlet dispatcherServlet,

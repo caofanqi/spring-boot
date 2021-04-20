@@ -51,6 +51,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 
 /**
+ * <p>servlet web服务器的自动配置。</p>
  * {@link EnableAutoConfiguration Auto-configuration} for servlet web servers.
  *
  * @author Phillip Webb
@@ -71,6 +72,7 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 		ServletWebServerFactoryConfiguration.EmbeddedUndertow.class })
 public class ServletWebServerFactoryAutoConfiguration {
 
+	// 定义一个ServletWebServerFactoryCustomizer bean，将serverProperties属性应用到web服务器
 	@Bean
 	public ServletWebServerFactoryCustomizer servletWebServerFactoryCustomizer(ServerProperties serverProperties,
 			ObjectProvider<WebListenerRegistrar> webListenerRegistrars) {
@@ -78,6 +80,7 @@ public class ServletWebServerFactoryAutoConfiguration {
 				webListenerRegistrars.orderedStream().collect(Collectors.toList()));
 	}
 
+	// 定义一个TomcatServletWebServerFactoryCustomizer bean，用于将ServerProperties属性应用到web服务器
 	@Bean
 	@ConditionalOnClass(name = "org.apache.catalina.startup.Tomcat")
 	public TomcatServletWebServerFactoryCustomizer tomcatServletWebServerFactoryCustomizer(
@@ -85,6 +88,7 @@ public class ServletWebServerFactoryAutoConfiguration {
 		return new TomcatServletWebServerFactoryCustomizer(serverProperties);
 	}
 
+	// 定义一个ForwardedHeaderFilter的FilterRegistrationBean
 	@Bean
 	@ConditionalOnMissingFilterBean(ForwardedHeaderFilter.class)
 	@ConditionalOnProperty(value = "server.forward-headers-strategy", havingValue = "framework")
@@ -117,9 +121,14 @@ public class ServletWebServerFactoryAutoConfiguration {
 			if (this.beanFactory == null) {
 				return;
 			}
+			/*
+			 * 注册WebServerFactoryCustomizerBeanPostProcessor，用于通过postProcessBeforeInitialization，
+			 * 在WebServerFactory实例化后，通过WebServerFactoryCustomizer来定制WebServerFactory配置。
+			 */
 			registerSyntheticBeanIfMissing(registry, "webServerFactoryCustomizerBeanPostProcessor",
 					WebServerFactoryCustomizerBeanPostProcessor.class,
 					WebServerFactoryCustomizerBeanPostProcessor::new);
+			// 注册ErrorPageRegistrarBeanPostProcessor，来处理ErrorPageRegistry
 			registerSyntheticBeanIfMissing(registry, "errorPageRegistrarBeanPostProcessor",
 					ErrorPageRegistrarBeanPostProcessor.class, ErrorPageRegistrarBeanPostProcessor::new);
 		}

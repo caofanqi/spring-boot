@@ -30,6 +30,7 @@ import org.springframework.core.metrics.StartupStep;
 import org.springframework.util.ReflectionUtils;
 
 /**
+ * <p>SpringApplicationRunListener的集合。</p>
  * A collection of {@link SpringApplicationRunListener}.
  *
  * @author Phillip Webb
@@ -49,6 +50,7 @@ class SpringApplicationRunListeners {
 		this.applicationStartup = applicationStartup;
 	}
 
+	// 发送starting事件
 	void starting(ConfigurableBootstrapContext bootstrapContext, Class<?> mainApplicationClass) {
 		doWithListeners("spring.boot.application.starting", (listener) -> listener.starting(bootstrapContext),
 				(step) -> {

@@ -24,11 +24,14 @@ import org.springframework.web.SpringServletContainerInitializer;
 import org.springframework.web.WebApplicationInitializer;
 
 /**
+ * <p>接口用于以编程方式配置Servlet 3.0+上下文。与WebApplicationInitializer不同，
+ * 实现这个接口的类(不实现WebApplicationInitializer)不会被SpringServletContainerInitializer检测到，因此不会被Servlet容器自动引导。</p>
  * Interface used to configure a Servlet 3.0+ {@link ServletContext context}
  * programmatically. Unlike {@link WebApplicationInitializer}, classes that implement this
  * interface (and do not implement {@link WebApplicationInitializer}) will <b>not</b> be
  * detected by {@link SpringServletContainerInitializer} and hence will not be
  * automatically bootstrapped by the Servlet container.
+ * <p>该接口被设计成以与ServletContainerInitializer类似的方式进行操作，但其生命周期由Spring管理，而不是Servlet容器。</p>
  * <p>
  * This interface is designed to act in a similar way to
  * {@link ServletContainerInitializer}, but have a lifecycle that's managed by Spring and

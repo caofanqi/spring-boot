@@ -1,0 +1,11 @@
+plugins {
+    id "java"
+    id "org.springframework.boot.conventions"
+}
+
+description = "Study Spring Boot Source Code"
+
+dependencies {
+    implementation(project(":spring-boot-project:spring-boot-starters:spring-boot-starter-web"))
+    implementation(project(":spring-boot-project:spring-boot-starters:spring-boot-starter-actuator"))
+}

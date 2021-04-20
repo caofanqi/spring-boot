@@ -28,6 +28,7 @@ import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.util.Assert;
 
 /**
+ * <p>默认ConfigurableBootstrapContext实现。</p>
  * Default {@link ConfigurableBootstrapContext} implementation.
  *
  * @author Phillip Webb

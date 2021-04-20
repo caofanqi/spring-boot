@@ -182,6 +182,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		if (this.disableMBeanRegistry) {
 			Registry.disableRegistry();
 		}
+		// 创建一个Tomcat
 		Tomcat tomcat = new Tomcat();
 		File baseDir = (this.baseDirectory != null) ? this.baseDirectory : createTempDir("tomcat");
 		tomcat.setBaseDir(baseDir.getAbsolutePath());
@@ -195,7 +196,9 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		for (Connector additionalConnector : this.additionalTomcatConnectors) {
 			tomcat.getService().addConnector(additionalConnector);
 		}
+		// 准备上下文，应用ServletContextInitializer
 		prepareContext(tomcat.getHost(), initializers);
+		// 创建TomcatWebServer
 		return getTomcatWebServer(tomcat);
 	}
 
@@ -208,6 +211,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 
 	protected void prepareContext(Host host, ServletContextInitializer[] initializers) {
 		File documentRoot = getValidDocumentRoot();
+		// 创建一个内置的tomcat上下文
 		TomcatEmbeddedContext context = new TomcatEmbeddedContext();
 		if (documentRoot != null) {
 			context.setResources(new LoaderHidingResourceRoot(context));
@@ -241,8 +245,10 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 			addJasperInitializer(context);
 		}
 		context.addLifecycleListener(new StaticResourceConfigurer(context));
+		// 合并获取ServletContextInitializer
 		ServletContextInitializer[] initializersToUse = mergeInitializers(initializers);
 		host.addChild(context);
+		// 配置上下文
 		configureContext(context, initializersToUse);
 		postProcessContext(context);
 	}
@@ -352,17 +358,24 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	}
 
 	/**
+	 * <p>配置Tomcat上下文。</p>
 	 * Configure the Tomcat {@link Context}.
 	 * @param context the Tomcat context
 	 * @param initializers initializers to apply
 	 */
 	protected void configureContext(Context context, ServletContextInitializer[] initializers) {
+		/*
+		 * 使用给定的ServletContextInitializer创建TomcatStarter，
+		 * TomcatStarter是ServletContainerInitializer的实现类，将
+		 * 该类添加到context中，会自动调用onStartup方法。
+		 */
 		TomcatStarter starter = new TomcatStarter(initializers);
 		if (context instanceof TomcatEmbeddedContext) {
 			TomcatEmbeddedContext embeddedContext = (TomcatEmbeddedContext) context;
 			embeddedContext.setStarter(starter);
 			embeddedContext.setFailCtxIfServletStartFails(true);
 		}
+		// 将TomcatStarter添加到Context中
 		context.addServletContainerInitializer(starter, NO_CLASSES);
 		for (LifecycleListener lifecycleListener : this.contextLifecycleListeners) {
 			context.addLifecycleListener(lifecycleListener);
@@ -380,6 +393,7 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 		for (MimeMappings.Mapping mapping : getMimeMappings()) {
 			context.addMimeMapping(mapping.getExtension(), mapping.getMimeType());
 		}
+		// 配置session
 		configureSession(context);
 		new DisableReferenceClearingContextCustomizer().customize(context);
 		for (String webListenerClassName : getWebListenerClassNames()) {
@@ -440,6 +454,8 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 	}
 
 	/**
+	 * <p>调用工厂方法来创建TomcatWebServer。
+	 * 子类可以重写该方法以返回不同的TomcatWebServer或对Tomcat服务器应用额外的处理。</p>
 	 * Factory method called to create the {@link TomcatWebServer}. Subclasses can
 	 * override this method to return a different {@link TomcatWebServer} or apply
 	 * additional processing to the Tomcat server.

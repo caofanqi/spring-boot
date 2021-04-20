@@ -36,6 +36,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.log.LogMessage;
 
 /**
+ * <p>将ConfigData加载并应用到Spring环境的环境后处理器。</p>
  * {@link EnvironmentPostProcessor} that loads and applies {@link ConfigData} to Spring's
  * {@link Environment}.
  *
@@ -94,6 +95,7 @@ public class ConfigDataEnvironmentPostProcessor implements EnvironmentPostProces
 		try {
 			this.logger.trace("Post-processing environment to add config data");
 			resourceLoader = (resourceLoader != null) ? resourceLoader : new DefaultResourceLoader();
+			// 创建ConfigDataEnvironment并调用其processAndApply方法（application.properties文件在此处理）；
 			getConfigDataEnvironment(environment, resourceLoader, additionalProfiles).processAndApply();
 		}
 		catch (UseLegacyConfigProcessingException ex) {

@@ -125,6 +125,7 @@ import org.springframework.web.util.UrlPathHelper;
 import org.springframework.web.util.pattern.PathPatternParser;
 
 /**
+ * <p>Web MVC的自动配置。</p>
  * {@link EnableAutoConfiguration Auto-configuration} for {@link EnableWebMvc Web MVC}.
  *
  * @author Phillip Webb
@@ -322,6 +323,7 @@ public class WebMvcAutoConfiguration {
 	}
 
 	/**
+	 * <p>配置等价于@EnableWebMvc。</p>
 	 * Configuration equivalent to {@code @EnableWebMvc}.
 	 */
 	@Configuration(proxyBeanMethods = false)

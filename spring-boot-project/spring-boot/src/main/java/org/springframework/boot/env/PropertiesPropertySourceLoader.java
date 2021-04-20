@@ -28,6 +28,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 /**
+ * <p>加载策略'。属性文件到PropertySource中。</p>
  * Strategy to load '.properties' files into a {@link PropertySource}.
  *
  * @author Dave Syer
@@ -46,6 +47,7 @@ public class PropertiesPropertySourceLoader implements PropertySourceLoader {
 
 	@Override
 	public List<PropertySource<?>> load(String name, Resource resource) throws IOException {
+		// 加载属性文件
 		List<Map<String, ?>> properties = loadProperties(resource);
 		if (properties.isEmpty()) {
 			return Collections.emptyList();
@@ -53,6 +55,7 @@ public class PropertiesPropertySourceLoader implements PropertySourceLoader {
 		List<PropertySource<?>> propertySources = new ArrayList<>(properties.size());
 		for (int i = 0; i < properties.size(); i++) {
 			String documentNumber = (properties.size() != 1) ? " (document #" + i + ")" : "";
+			// 将属性文件封装为OriginTrackedMapPropertySource添加到propertySources中
 			propertySources.add(new OriginTrackedMapPropertySource(name + documentNumber,
 					Collections.unmodifiableMap(properties.get(i)), true));
 		}

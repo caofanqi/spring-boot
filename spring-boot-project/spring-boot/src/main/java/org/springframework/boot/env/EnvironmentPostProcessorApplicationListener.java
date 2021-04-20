@@ -47,6 +47,9 @@ public class EnvironmentPostProcessorApplicationListener implements SmartApplica
 
 	private int order = DEFAULT_ORDER;
 
+	/*
+	 * 内部含有META-INF/spring.factories中所有EnvironmentPostProcessor的全限定类名
+	 */
 	private final EnvironmentPostProcessorsFactory postProcessorsFactory;
 
 	/**
@@ -83,6 +86,7 @@ public class EnvironmentPostProcessorApplicationListener implements SmartApplica
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
 		if (event instanceof ApplicationEnvironmentPreparedEvent) {
+			// Environment准备好后，进行的事件处理
 			onApplicationEnvironmentPreparedEvent((ApplicationEnvironmentPreparedEvent) event);
 		}
 		if (event instanceof ApplicationPreparedEvent) {
@@ -97,6 +101,7 @@ public class EnvironmentPostProcessorApplicationListener implements SmartApplica
 		ConfigurableEnvironment environment = event.getEnvironment();
 		SpringApplication application = event.getSpringApplication();
 		for (EnvironmentPostProcessor postProcessor : getEnvironmentPostProcessors(event.getBootstrapContext())) {
+			// 调用EnvironmentPostProcessor的postProcessEnvironment进行处理
 			postProcessor.postProcessEnvironment(environment, application);
 		}
 	}

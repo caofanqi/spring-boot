@@ -23,6 +23,7 @@ import org.springframework.core.env.PropertyResolver;
 import org.springframework.core.env.PropertySource;
 
 /**
+ * <p>PropertySource，公开ConfigurationPropertySource实例，以便它们可以与PropertyResolver一起使用或添加到环境中。</p>
  * {@link PropertySource} that exposes {@link ConfigurationPropertySource} instances so
  * that they can be used with a {@link PropertyResolver} or added to the
  * {@link Environment}.

@@ -37,6 +37,9 @@ import org.springframework.core.annotation.AliasFor;
 import org.springframework.data.repository.Repository;
 
 /**
+ * <p>指示一个配置类，该类声明一个或多个@Bean方法，还会触发自动配置和组件扫描。
+ * 这是一个便利的注释，相当于声明@Configuration、@EnableAutoConfiguration和@ComponentScan。</p>
+ *
  * Indicates a {@link Configuration configuration} class that declares one or more
  * {@link Bean @Bean} methods and also triggers {@link EnableAutoConfiguration
  * auto-configuration} and {@link ComponentScan component scanning}. This is a convenience

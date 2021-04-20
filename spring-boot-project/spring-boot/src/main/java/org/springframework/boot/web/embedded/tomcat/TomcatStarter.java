@@ -28,6 +28,9 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 
 /**
+ * <p>ServletContainerInitializer用于触发ServletContextInitializer，跟踪启动错误。</p>
+ * <p>SpringBoot内部使用。</p>
+ *
  * {@link ServletContainerInitializer} used to trigger {@link ServletContextInitializer
  * ServletContextInitializers} and track startup errors.
  *
@@ -50,6 +53,7 @@ class TomcatStarter implements ServletContainerInitializer {
 	public void onStartup(Set<Class<?>> classes, ServletContext servletContext) throws ServletException {
 		try {
 			for (ServletContextInitializer initializer : this.initializers) {
+				// 调用ServletContextInitializer的onStartup方法
 				initializer.onStartup(servletContext);
 			}
 		}

@@ -36,6 +36,8 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.ErrorHandler;
 
 /**
+ * <p>发布SpringApplicationEvents的SpringApplicationRunListener。</p>
+ * <p>使用内部的ApplicationEventMulticaster来处理在上下文实际刷新之前触发的事件。</p>
  * {@link SpringApplicationRunListener} to publish {@link SpringApplicationEvent}s.
  * <p>
  * Uses an internal {@link ApplicationEventMulticaster} for the events that are fired

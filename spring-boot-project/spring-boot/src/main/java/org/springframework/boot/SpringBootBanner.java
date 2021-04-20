@@ -24,6 +24,7 @@ import org.springframework.boot.ansi.AnsiStyle;
 import org.springframework.core.env.Environment;
 
 /**
+ * <p>默认的横幅实现，写'Spring'横幅。</p>
  * Default Banner implementation which writes the 'Spring' banner.
  *
  * @author Phillip Webb

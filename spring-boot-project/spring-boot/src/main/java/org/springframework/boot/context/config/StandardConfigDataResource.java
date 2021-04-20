@@ -24,6 +24,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
+ * <p>ConfigDataResource由资源支持。</p>
  * {@link ConfigDataResource} backed by a {@link Resource}.
  *
  * @author Madhura Bhave

@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.springframework.boot.logging.DeferredLogFactory;
 
 /**
+ * <p>通过解析和加载位置导入ConfigData。跟踪资源以确保它们不会被多次导入。</p>
  * Imports {@link ConfigData} by {@link ConfigDataLocationResolver resolving} and
  * {@link ConfigDataLoader loading} locations. {@link ConfigDataResource resources} are
  * tracked to ensure that they are not imported multiple times.
@@ -65,6 +66,7 @@ class ConfigDataImporter {
 	}
 
 	/**
+	 * <p>解析并加载给定的locations列表，过滤之前加载的任何位置。</p>
 	 * Resolve and load the given list of locations, filtering any that have been
 	 * previously loaded.
 	 * @param activationContext the activation context
@@ -78,7 +80,9 @@ class ConfigDataImporter {
 			List<ConfigDataLocation> locations) {
 		try {
 			Profiles profiles = (activationContext != null) ? activationContext.getProfiles() : null;
+			// 获取要加载的资源和位置信息
 			List<ConfigDataResolutionResult> resolved = resolve(locationResolverContext, profiles, locations);
+			// 资源加载
 			return load(loaderContext, resolved);
 		}
 		catch (IOException ex) {
@@ -115,6 +119,7 @@ class ConfigDataImporter {
 			ConfigDataResource resource = candidate.getResource();
 			if (this.loaded.add(resource)) {
 				try {
+					// 通过ConfigDataLoader加载ConfigData
 					ConfigData loaded = this.loaders.load(loaderContext, resource);
 					if (loaded != null) {
 						result.put(candidate, loaded);

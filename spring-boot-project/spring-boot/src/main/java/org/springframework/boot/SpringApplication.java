@@ -85,6 +85,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.support.StandardServletEnvironment;
 
 /**
+ * <p>该类可以用来从Java main方法引导和启动Spring应用程序。默认情况下，class将执行以下步骤来引导应用程序:</p>
+ * <ul>
+ * <li>创建一个适当的ApplicationContext实例(取决于您的类路径)</li>
+ * <li>注册一个CommandLinePropertySource，将命令行参数作为Spring属性公开</li>
+ * <li>刷新应用程序上下文，加载所有单例bean</li>
+ * <li>触发任何CommandLineRunner bean</li>
+ * </ul>
  * Class that can be used to bootstrap and launch a Spring application from a Java main
  * method. By default class will perform the following steps to bootstrap your
  * application:
@@ -98,6 +105,7 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  * <li>Trigger any {@link CommandLineRunner} beans</li>
  * </ul>
  *
+ * <p>在大多数情况下，静态run(Class, String[])方法可以直接从你的main方法调用来引导你的应用程序:</p>
  * In most circumstances the static {@link #run(Class, String[])} method can be called
  * directly from your {@literal main} method to bootstrap your application:
  *
@@ -114,6 +122,7 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  * }
  * </pre>
  *
+ * <p>对于更高级的配置，SpringApplication实例可以在run之前创建和定制:</p>
  * <p>
  * For more advanced configuration a {@link SpringApplication} instance can be created and
  * customized before being run:
@@ -126,6 +135,7 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  * }
  * </pre>
  *
+ * <p>spring应用程序可以从各种不同的源读取bean。通常建议使用一个@Configuration类来引导你的应用程序，但是，你也可以通过以下方式设置源:</p>
  * {@link SpringApplication}s can read beans from a variety of different sources. It is
  * generally recommended that a single {@code @Configuration} class is used to bootstrap
  * your application, however, you may also set {@link #getSources() sources} from:
@@ -254,6 +264,7 @@ public class SpringApplication {
 	private ApplicationStartup applicationStartup = ApplicationStartup.DEFAULT;
 
 	/**
+	 * <p>创建一个新的SpringApplication实例。应用程序上下文将从指定的主源加载bean。可以在调用run(String…)之前自定义实例。</p>
 	 * Create a new {@link SpringApplication} instance. The application context will load
 	 * beans from the specified primary sources (see {@link SpringApplication class-level}
 	 * documentation for details. The instance can be customized before calling
@@ -264,10 +275,12 @@ public class SpringApplication {
 	 * @see #setSources(Set)
 	 */
 	public SpringApplication(Class<?>... primarySources) {
+		// 调用自己两个参数的构造方法
 		this(null, primarySources);
 	}
 
 	/**
+	 * <p>创建一个新的SpringApplication实例。应用程序上下文将从指定的主源加载bean。可以在调用run(String…)之前自定义实例。</p>
 	 * Create a new {@link SpringApplication} instance. The application context will load
 	 * beans from the specified primary sources (see {@link SpringApplication class-level}
 	 * documentation for details. The instance can be customized before calling
@@ -282,10 +295,15 @@ public class SpringApplication {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+		// 推断web应用类型
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
+		// 初始化BootstrapRegistryInitializer，从META-INF/spring.factories中获取
 		this.bootstrapRegistryInitializers = getBootstrapRegistryInitializersFromSpringFactories();
+		// 初始化ApplicationContextInitializer，从META-INF/spring.factories中获取
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
+		// 初始化ApplicationListener，从META-INF/spring.factories中获取
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+		// 推断main方法所在类
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
@@ -301,6 +319,7 @@ public class SpringApplication {
 
 	private Class<?> deduceMainApplicationClass() {
 		try {
+			// 使用堆栈异常来推到main方法所在的class对象
 			StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
 			for (StackTraceElement stackTraceElement : stackTrace) {
 				if ("main".equals(stackTraceElement.getMethodName())) {
@@ -315,34 +334,64 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>运行Spring应用程序，创建并刷新一个新的ApplicationContext。</p>
 	 * Run the Spring application, creating and refreshing a new
 	 * {@link ApplicationContext}.
 	 * @param args the application arguments (usually passed from a Java main method)
 	 * @return a running {@link ApplicationContext}
 	 */
 	public ConfigurableApplicationContext run(String... args) {
+		// 计时器
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
+		// 创建一个启动上下文，在ApplicationContext可用之前，可以使用。
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 		ConfigurableApplicationContext context = null;
+		// 配置java.awt.headless属性
 		configureHeadlessProperty();
+		/*
+		 * 获取META-INF/spring.factories中的SpringApplicationRunListener集合，监听该run方法。
+		 * 创建SpringApplicationRunListener实例时，会使用带有当前SpringApplication实例和args数组的构造函数初始化；
+		 * 默认有一个EventPublishingRunListener，会初始化一个initialMulticaster，并将当前SpringApplication实例
+		 * 的ApplicationListener添加到里面。
+		 */
 		SpringApplicationRunListeners listeners = getRunListeners(args);
+		// 发送starting事件（EventPublishingRunListener会发送ApplicationStartingEvent事件）。
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
 		try {
+			// 将命令行参数args，封装为ApplicationArguments，方便访问
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+			// 创建并配置Environment
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
+			// 配置spring.beaninfo.ignore属性
 			configureIgnoreBeanInfo(environment);
+			// 打印Banner信息
 			Banner printedBanner = printBanner(environment);
+			/*
+			 * 使用applicationContextFactory创建ConfigurableApplicationContext，
+			 * 默认情况下，根据webApplicationType来创建不同的应用上下文对象，
+			 * 可以通过编程方式修改applicationContextFactory进行指定。
+			 */
 			context = createApplicationContext();
 			context.setApplicationStartup(this.applicationStartup);
+			/*
+			 * 准备上下文，包含下列关键步骤
+			 * 设置environment、应用ApplicationContextInitializer、发送contextPrepared事件
+			 * 加载source（加载BeanDefinition），发送contextLoaded事件
+			 */
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
+			// 刷新上下文
 			refreshContext(context);
+			// 空实现，子类扩展使用
 			afterRefresh(context, applicationArguments);
 			stopWatch.stop();
 			if (this.logStartupInfo) {
+				// 打印启动时间日志
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), stopWatch);
 			}
+			// 发送started事件
 			listeners.started(context);
+			// 调用ApplicationRunner、CommandLineRunner的run方法
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
@@ -351,6 +400,7 @@ public class SpringApplication {
 		}
 
 		try {
+			// 发送running事件
 			listeners.running(context);
 		}
 		catch (Throwable ex) {
@@ -369,14 +419,24 @@ public class SpringApplication {
 	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
 			DefaultBootstrapContext bootstrapContext, ApplicationArguments applicationArguments) {
 		// Create and configure the environment
+		// 如果用户提供了环境，使用用户提供的；没提供会根据webApplicationType类型创建相应的Environment
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
+		/*
+		 * 配置PropertySources，默认行为是，添加defaultProperties和命令行参数；
+		 * 配置Profiles，默认空实现；
+		 */
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
+		// 向环境中添加一个SpringConfigurationPropertySources
 		ConfigurationPropertySources.attach(environment);
+		// 发布environmentPrepared事件（application.properties文件会在此处解析加载到environment中）
 		listeners.environmentPrepared(bootstrapContext, environment);
+		// 移动'defaultProperties'属性源，使其成为给定可配置环境中的最后一个源。
 		DefaultPropertiesPropertySource.moveToEnd(environment);
+		// 配置附加Profiles
 		configureAdditionalProfiles(environment);
 		bindToSpringApplication(environment);
 		if (!this.isCustomEnvironment) {
+			// 不是自定义Environment的话，如果经过前面处理过后的环境和推断的环境不一致，进行转换
 			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment,
 					deduceEnvironmentClass());
 		}
@@ -398,22 +458,32 @@ public class SpringApplication {
 	private void prepareContext(DefaultBootstrapContext bootstrapContext, ConfigurableApplicationContext context,
 			ConfigurableEnvironment environment, SpringApplicationRunListeners listeners,
 			ApplicationArguments applicationArguments, Banner printedBanner) {
+		// 使用之前配置过的environment
 		context.setEnvironment(environment);
+		// 将一些SpringApplication设置到ApplicationContext中
 		postProcessApplicationContext(context);
+		// 在上下文被刷新之前应用任何ApplicationContextInitializer
 		applyInitializers(context);
+		// 发送contextPrepared事件
 		listeners.contextPrepared(context);
+		// 关闭bootstrapContext
 		bootstrapContext.close(context);
 		if (this.logStartupInfo) {
+			// active profile相关日志打印
 			logStartupInfo(context.getParent() == null);
 			logStartupProfileInfo(context);
 		}
 		// Add boot specific singleton beans
+		// 添加boot特殊的单例bean
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+		// 命令行参数applicationArguments
 		beanFactory.registerSingleton("springApplicationArguments", applicationArguments);
 		if (printedBanner != null) {
+			// Banner
 			beanFactory.registerSingleton("springBootBanner", printedBanner);
 		}
 		if (beanFactory instanceof DefaultListableBeanFactory) {
+			// 设置同名bean定义是否允许覆盖，boot默认设置为false；DefaultListableBeanFactory默认为true；
 			((DefaultListableBeanFactory) beanFactory)
 					.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
@@ -421,21 +491,25 @@ public class SpringApplication {
 			context.addBeanFactoryPostProcessor(new LazyInitializationBeanFactoryPostProcessor());
 		}
 		// Load the sources
+		// 加载资源（将配置类转换为bean定义注册到工厂中）
 		Set<Object> sources = getAllSources();
 		Assert.notEmpty(sources, "Sources must not be empty");
 		load(context, sources.toArray(new Object[0]));
+		// 发送contextLoaded事件
 		listeners.contextLoaded(context);
 	}
 
 	private void refreshContext(ConfigurableApplicationContext context) {
 		if (this.registerShutdownHook) {
 			try {
+				// 注册JVM关闭钩子
 				context.registerShutdownHook();
 			}
 			catch (AccessControlException ex) {
 				// Not allowed in some environments.
 			}
 		}
+		// 刷新上下文
 		refresh((ApplicationContext) context);
 	}
 
@@ -445,6 +519,7 @@ public class SpringApplication {
 	}
 
 	private SpringApplicationRunListeners getRunListeners(String[] args) {
+		// 用于获取参数类型为(SpringApplication.class,String[].class)的构造函数
 		Class<?>[] types = new Class<?>[] { SpringApplication.class, String[].class };
 		return new SpringApplicationRunListeners(logger,
 				getSpringFactoriesInstances(SpringApplicationRunListener.class, types, this, args),
@@ -458,8 +533,11 @@ public class SpringApplication {
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes, Object... args) {
 		ClassLoader classLoader = getClassLoader();
 		// Use names and ensure unique to protect against duplicates
+		// 使用名称并确保唯一，以防止重复（这里用了一个LinkedHashSet去重）
 		Set<String> names = new LinkedHashSet<>(SpringFactoriesLoader.loadFactoryNames(type, classLoader));
+		// 使用给定参数类型和参数获取对应的构造函数创建实例
 		List<T> instances = createSpringFactoriesInstances(type, parameterTypes, classLoader, args, names);
+		// 排序
 		AnnotationAwareOrderComparator.sort(instances);
 		return instances;
 	}
@@ -471,7 +549,9 @@ public class SpringApplication {
 		for (String name : names) {
 			try {
 				Class<?> instanceClass = ClassUtils.forName(name, classLoader);
+				// 类型检查
 				Assert.isAssignable(type, instanceClass);
+				// 获取构造方法，并实例化
 				Constructor<?> constructor = instanceClass.getDeclaredConstructor(parameterTypes);
 				T instance = (T) BeanUtils.instantiateClass(constructor, args);
 				instances.add(instance);
@@ -485,6 +565,7 @@ public class SpringApplication {
 
 	private ConfigurableEnvironment getOrCreateEnvironment() {
 		if (this.environment != null) {
+			// 使用main方法里面提供的
 			return this.environment;
 		}
 		switch (this.webApplicationType) {
@@ -498,6 +579,9 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>模板方法按顺序委托给configurePropertySources(ConfigurableEnvironment, String[])
+	 * 和configureProfiles(ConfigurableEnvironment, String[])。
+	 * 重写此方法以完全控制环境定制，或分别重写上述方法之一以细粒度控制属性源或概要文件</p>
 	 * Template method delegating to
 	 * {@link #configurePropertySources(ConfigurableEnvironment, String[])} and
 	 * {@link #configureProfiles(ConfigurableEnvironment, String[])} in that order.
@@ -510,14 +594,18 @@ public class SpringApplication {
 	 */
 	protected void configureEnvironment(ConfigurableEnvironment environment, String[] args) {
 		if (this.addConversionService) {
+			// 添加类型转换服务
 			ConversionService conversionService = ApplicationConversionService.getSharedInstance();
 			environment.setConversionService((ConfigurableConversionService) conversionService);
 		}
+		// 配置PropertySources，默认行为是，添加defaultProperties和命令行参数
 		configurePropertySources(environment, args);
+		// 配置Profiles，默认空实现
 		configureProfiles(environment, args);
 	}
 
 	/**
+	 * <p>在此应用程序的environment中添加、删除或重新排序任何PropertySource。</p>
 	 * Add, remove or re-order any {@link PropertySource}s in this application's
 	 * environment.
 	 * @param environment this application's environment
@@ -527,9 +615,11 @@ public class SpringApplication {
 	protected void configurePropertySources(ConfigurableEnvironment environment, String[] args) {
 		MutablePropertySources sources = environment.getPropertySources();
 		if (!CollectionUtils.isEmpty(this.defaultProperties)) {
+			// main方法编程提供了默认的defaultProperties，进行添加
 			DefaultPropertiesPropertySource.addOrMerge(this.defaultProperties, sources);
 		}
 		if (this.addCommandLineProperties && args.length > 0) {
+			// 将命令行参数添加到environment中
 			String name = CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME;
 			if (sources.contains(name)) {
 				PropertySource<?> source = sources.get(name);
@@ -546,6 +636,7 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>为这个应用程序环境配置哪些概要文件是活动的(或默认是活动的)。在配置文件处理过程中，可以通过spring.profiles.active属性激活其他配置文件。</p>
 	 * Configure which profiles are active (or active by default) for this application
 	 * environment. Additional profiles may be activated during configuration file
 	 * processing via the {@code spring.profiles.active} property.
@@ -575,6 +666,7 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>将environment绑定到spring应用程序。</p>
 	 * Bind the environment to the {@link SpringApplication}.
 	 * @param environment the environment to bind
 	 */
@@ -589,11 +681,13 @@ public class SpringApplication {
 
 	private Banner printBanner(ConfigurableEnvironment environment) {
 		if (this.bannerMode == Banner.Mode.OFF) {
+			// 配置OFF直接返回null；
 			return null;
 		}
 		ResourceLoader resourceLoader = (this.resourceLoader != null) ? this.resourceLoader
 				: new DefaultResourceLoader(null);
 		SpringApplicationBannerPrinter bannerPrinter = new SpringApplicationBannerPrinter(resourceLoader, this.banner);
+
 		if (this.bannerMode == Mode.LOG) {
 			return bannerPrinter.print(environment, this.mainApplicationClass, logger);
 		}
@@ -601,6 +695,8 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>用于创建ApplicationContext的策略方法。
+	 * 默认情况下，此方法在退回到合适的默认值之前将尊重任何显式设置的应用程序上下文类或工厂。</p>
 	 * Strategy method used to create the {@link ApplicationContext}. By default this
 	 * method will respect any explicitly set application context class or factory before
 	 * falling back to a suitable default.
@@ -613,6 +709,7 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>在ApplicationContext中应用任何相关的后处理。子类可以根据需要应用额外的处理。</p>
 	 * Apply any relevant post processing the {@link ApplicationContext}. Subclasses can
 	 * apply additional processing as required.
 	 * @param context the application context
@@ -636,6 +733,7 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>在上下文被刷新之前应用任何ApplicationContextInitializer到它。</p>
 	 * Apply any {@link ApplicationContextInitializer}s to the context before it is
 	 * refreshed.
 	 * @param context the configured ApplicationContext (not refreshed yet)
@@ -663,6 +761,7 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>调用以记录active profile信息</p>
 	 * Called to log active profile information.
 	 * @param context the application context
 	 */
@@ -694,6 +793,7 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>将bean加载到应用程序上下文中。</p>
 	 * Load beans into the application context.
 	 * @param context the context to load beans into
 	 * @param sources the sources to load
@@ -702,6 +802,7 @@ public class SpringApplication {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Loading source " + StringUtils.arrayToCommaDelimitedString(sources));
 		}
+		// 默认创建AnnotatedBeanDefinitionReader
 		BeanDefinitionLoader loader = createBeanDefinitionLoader(getBeanDefinitionRegistry(context), sources);
 		if (this.beanNameGenerator != null) {
 			loader.setBeanNameGenerator(this.beanNameGenerator);
@@ -763,6 +864,7 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>刷新底层的ApplicationContext。</p>
 	 * Refresh the underlying {@link ApplicationContext}.
 	 * @param applicationContext the application context to refresh
 	 * @deprecated since 2.3.0 for removal in 2.5.0 in favor of
@@ -775,14 +877,17 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>刷新底层的ApplicationContext。</p>
 	 * Refresh the underlying {@link ApplicationContext}.
 	 * @param applicationContext the application context to refresh
 	 */
 	protected void refresh(ConfigurableApplicationContext applicationContext) {
+		// 刷新方法
 		applicationContext.refresh();
 	}
 
 	/**
+	 * <p>在上下文刷新后调用。</p>
 	 * Called after the context has been refreshed.
 	 * @param context the application context
 	 * @param args the application arguments
@@ -1189,6 +1294,7 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>调用run(String…)时，返回所有将添加到ApplicationContext的源的不可变集合。此方法将构造函数中指定的任何主源与显式设置的任何附加源组合在一起。</p>
 	 * Return an immutable set of all the sources that will be added to an
 	 * ApplicationContext when {@link #run(String...)} is called. This method combines any
 	 * primary sources specified in the constructor with any additional ones that have
@@ -1319,6 +1425,7 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>静态助手，可以使用默认设置从指定的源运行SpringApplication。</p>
 	 * Static helper that can be used to run a {@link SpringApplication} from the
 	 * specified source using default settings.
 	 * @param primarySource the primary source to load
@@ -1330,6 +1437,7 @@ public class SpringApplication {
 	}
 
 	/**
+	 * <p>静态助手，可以使用默认设置和用户提供的参数从指定的源运行SpringApplication。</p>
 	 * Static helper that can be used to run a {@link SpringApplication} from the
 	 * specified sources using default settings and user supplied arguments.
 	 * @param primarySources the primary sources to load
@@ -1337,6 +1445,7 @@ public class SpringApplication {
 	 * @return the running {@link ApplicationContext}
 	 */
 	public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
+		// 创建SpringApplication类的实例，并调用run方法。
 		return new SpringApplication(primarySources).run(args);
 	}
 

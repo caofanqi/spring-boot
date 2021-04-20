@@ -19,6 +19,7 @@ package org.springframework.boot.web.servlet;
 import javax.servlet.annotation.WebListener;
 
 /**
+ * <p>由注册@WebListeners的类型来实现的接口。</p>
  * Interface to be implemented by types that register {@link WebListener @WebListeners}.
  *
  * @author Andy Wilkinson

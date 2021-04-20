@@ -31,6 +31,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 
 /**
+ * <p>SpringApplication用于打印应用程序横幅的类。</p>
  * Class used by {@link SpringApplication} to print the application banner.
  *
  * @author Phillip Webb

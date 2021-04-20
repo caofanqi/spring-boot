@@ -29,6 +29,7 @@ import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.util.Assert;
 
 /**
+ * <p>提供对ConfigurationPropertySources的访问。</p>
  * Provides access to {@link ConfigurationPropertySource ConfigurationPropertySources}.
  *
  * @author Phillip Webb

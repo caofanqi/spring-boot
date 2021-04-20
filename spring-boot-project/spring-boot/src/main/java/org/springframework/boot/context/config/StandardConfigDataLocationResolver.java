@@ -43,6 +43,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * <p>用于标准位置的ConfigDataLocationResolver。</p>
  * {@link ConfigDataLocationResolver} for standard locations.
  *
  * @author Madhura Bhave

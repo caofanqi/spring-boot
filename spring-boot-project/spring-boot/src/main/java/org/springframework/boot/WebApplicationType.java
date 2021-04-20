@@ -19,6 +19,7 @@ package org.springframework.boot;
 import org.springframework.util.ClassUtils;
 
 /**
+ * <p>可能的web应用程序类型的枚举。</p>
  * An enumeration of possible types of web application.
  *
  * @author Andy Wilkinson
@@ -28,18 +29,21 @@ import org.springframework.util.ClassUtils;
 public enum WebApplicationType {
 
 	/**
+	 * <p>应用程序不应该作为web应用程序运行，也不应该启动嵌入式web服务器。</p>
 	 * The application should not run as a web application and should not start an
 	 * embedded web server.
 	 */
 	NONE,
 
 	/**
+	 * <p>应用程序应该作为基于servlet的web应用程序运行，并且应该启动嵌入式servlet web服务器。</p>
 	 * The application should run as a servlet-based web application and should start an
 	 * embedded servlet web server.
 	 */
 	SERVLET,
 
 	/**
+	 * <p>应用程序应该作为一个响应式web应用程序运行，并且应该启动一个嵌入式响应式web服务器。</p>
 	 * The application should run as a reactive web application and should start an
 	 * embedded reactive web server.
 	 */

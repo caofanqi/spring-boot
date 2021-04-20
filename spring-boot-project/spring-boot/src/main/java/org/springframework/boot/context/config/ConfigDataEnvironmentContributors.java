@@ -44,6 +44,7 @@ import org.springframework.core.log.LogMessage;
 import org.springframework.util.ObjectUtils;
 
 /**
+ * <p>用于处理导入的ConfigDataEnvironmentContributors的不可变树结构。</p>
  * An immutable tree structure of {@link ConfigDataEnvironmentContributors} used to
  * process imports.
  *
@@ -81,6 +82,7 @@ class ConfigDataEnvironmentContributors implements Iterable<ConfigDataEnvironmen
 	}
 
 	/**
+	 * <p>处理所有活动contributors的导入，并返回一个新的ConfigDataEnvironmentContributors实例。</p>
 	 * Processes imports from all active contributors and return a new
 	 * {@link ConfigDataEnvironmentContributors} instance.
 	 * @param importer the importer used to import {@link ConfigData}
@@ -118,6 +120,7 @@ class ConfigDataEnvironmentContributors implements Iterable<ConfigDataEnvironmen
 			ConfigDataLoaderContext loaderContext = new ContributorDataLoaderContext(this);
 			List<ConfigDataLocation> imports = contributor.getImports();
 			this.logger.trace(LogMessage.format("Processing imports %s", imports));
+			// 解析和加载属性配置文件
 			Map<ConfigDataResolutionResult, ConfigData> imported = importer.resolveAndLoad(activationContext,
 					locationResolverContext, loaderContext, imports);
 			this.logger.trace(LogMessage.of(() -> getImportedMessage(imported.keySet())));

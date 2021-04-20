@@ -21,6 +21,10 @@ import org.springframework.boot.origin.OriginProvider;
 import org.springframework.util.StringUtils;
 
 /**
+ * <p>用户指定的位置，可以解析到一个或多个配置数据资源。ConfigDataLocation是一个简单的字符串值包装器。
+ * 值的确切格式将取决于底层技术，但通常是由前缀和路径组成的类似URL的语法。例如,crypt:somehost/somepath。</p>
+ * <p>位置可以是强制性的，也可以是可选的。可选位置前缀为optional:。</p>
+ *
  * A user specified location that can be {@link ConfigDataLocationResolver resolved} to
  * one or more {@link ConfigDataResource config data resources}. A
  * {@link ConfigDataLocation} is a simple wrapper around a {@link String} value. The exact
